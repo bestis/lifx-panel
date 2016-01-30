@@ -1,0 +1,14 @@
+{
+  "name": "lifx-panel",
+  "version": "0.0.1",
+  "description": "LIFX Panel",
+  "author": "Jani Ollikainen <jani.ollikainen@iki.fi>",
+  "license": "BSD",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bestis/lifx-panel.git"
+  },
+  "dependencies": {
+    "bower": "~1.7"
+  }
+}

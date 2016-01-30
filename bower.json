@@ -1,0 +1,21 @@
+{
+  "name": "lifx-panel",
+  "description": "LIFX Panel",
+  "main": "",
+  "authors": [
+    "Jani Ollikainen <jani.ollikainen@iki.fi>"
+  ],
+  "homepage": "https://github.com/bestis/lifx-panel",
+  "license": "BSD",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "js",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ng-colorwheel": "latest"
+  }
+}

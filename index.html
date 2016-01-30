@@ -1,0 +1,121 @@
+ <!DOCTYPE html>
+<html lang="en" ng-app="lifxApp">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<title>LIFX Panel</title>
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+	<!-- Angular -->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/2.5.0/rzslider.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/2.5.0/rzslider.min.css">
+
+	<!-- Style -->
+	<link rel="stylesheet" href="main.css">
+</head>
+<body ng-controller="LifxController">
+	<div ng-if="loading" class="loading">
+		<img class="loading-image" src="ajax-loader.gif" alt="Loading..." />
+	</div>
+	<div ng-if="!token" class="container" ng-cloak>
+		<form class="form-signin" ng-submit="setToken()">
+			<div class="control-group">
+				<h2 class="form-signin-heading">Sign in</h2>
+				<div class="form-group" ng-class="{'has-error':tokenError}">
+					<input type="password" id="token" ng-model="newToken" class="form-control" placeholder="LIFX Token" required>
+					<span ng-show="tokenError" class="help-block" ng-bind="tokenError"></span>
+				</div>
+				<button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+				<p>No token? <a href="https://cloud.lifx.com/settings">Generate your own!</a></p>
+			</div>
+		</form>
+	</div>
+	<div ng-if="token" ng-cloak>
+		<div id="menu">
+			<button class="btn btn-lg btn-primary" ng-click="postRequest('all','toggle')">Power on/off</button>
+			<button class="btn btn-lg btn-primary" ng-click="clearToken()">Logout</button>
+		</div>
+		<div id="selectors">
+			<p><strong>Select lamp, location or group</strong></p>
+			<select id="lampselect" ng-model="current">
+				<optgroup label="All">
+					<option value="all">All</option>
+				</optgroup>
+				<optgroup label="Lights">
+					<option ng-repeat="light in lights" value="id:[[ light.id ]]">[[ light.label ]]</option>
+				</optgroup>
+				
+				<optgroup label="Locations">
+					<option ng-repeat="location in locations" value="location_id:[[ location.id ]]">[[ location.name ]]</option>
+				</optgroup>
+				<optgroup label="Groups">
+					<option ng-repeat="group in groups" value="group_id:[[ group.id ]]">[[ group.name ]]</option>
+				</optgroup>
+			</select>
+		</div>
+		<div ng-show="tab == 'color'" id="color">
+			<div id="colorwheel">
+				Color: [[ color ]]<br/><div ng-colorwheel="{ size: 200, segments: 180 }" ng-model="color"></div>
+			</div>
+			<div id="sliders">
+				<div ng-show="color=='#ffffff'">
+					Kelvin: <rzslider rz-slider-model="kelvin" rz-slider-options="{floor: 2500, ceil: 9000}"></rzslider>
+				</div>
+				<div>
+					Brightness: <rzslider rz-slider-model="brightness" rz-slider-options="{floor: 0, ceil: 100, step: 1}"></rzslider>
+				</div>
+				<div>
+					Duration: <rzslider rz-slider-model="duration" rz-slider-options="{floor: 0, ceil: 100, step: 1}"></rzslider>
+				</div>
+			</div>
+		</div>
+		<div ng-show="tab == 'breathe'" id="breathe">
+			<div id="colorwheel1">
+				Color: [[ color1 ]]<br/><div ng-colorwheel="{ size: 200, segments: 180 }" ng-model="color1"></div>
+			</div>
+			<div id="colorwheel2">
+				From color: [[ from_color ]]<br/><div ng-colorwheel="{ size: 200, segments: 180 }" ng-model="from_color"></div>
+			</div>
+			<div id="breathsliders">
+				<div>
+					Period: <rzslider rz-slider-model="period" rz-slider-options="{floor: 0, ceil: 100, step: 1}"></rzslider>
+				</div>
+				<div>
+					Cycles: <rzslider rz-slider-model="cycles" rz-slider-options="{floor: 0, ceil: 1000000, step: 1}"></rzslider>
+				</div>
+				<div>
+					Peak: <rzslider rz-slider-model="peak" rz-slider-options="{floor: 0, ceil: 100, step: 1}"></rzslider>
+				</div>
+			</div>
+		</div>
+		<div id="actions">
+			<button ng-show="tab == 'color'" class="btn btn-lg btn-primary" ng-click="setColor(current, color, brightness, kelvin, duration)">Set color</button>
+			<button ng-show="tab != 'color'" class="btn btn-lg btn-primary" ng-click="tab = 'color'">Color</button>
+			<button ng-show="tab == 'breathe'" class="btn btn-lg btn-primary" ng-click="setEffect1(current, 'breathe', color1, from_color, period, cycles, peak)">Set breathing</button>
+			<button ng-show="tab == 'breathe'" class="btn btn-lg btn-primary" ng-click="setEffect1(current, 'pulse', color1, from_color, period, cycles, peak)">Set pulse</button>
+			<button ng-show="tab != 'breathe'" class="btn btn-lg btn-primary" ng-click="tab = 'breathe'">Breathe or pulse</button>
+			<button class="btn btn-lg btn-primary" ng-click="powerCycle(current)">Brigthness</button>
+			<button class="btn btn-lg btn-primary" ng-click="postRequest(current,'toggle')">On/Off</button>
+		</div>
+	</div >
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<!-- colorwheel -->
+	<script src="js/raphael/raphael-min.js"></script>
+	<script src="js/colorwheel/colorwheel.js"></script>
+	<script src="js/ng-colorwheel/dist/ng-colorwheel.js"></script>
+	<!-- Custom code -->
+	<script src="main.js"></script>
+</body>
+</html>
