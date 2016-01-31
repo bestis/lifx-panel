@@ -6,7 +6,7 @@ Standalone Panel implementation for LIFX HTTP API (http://api.developer.lifx.com
 It isn't complete implementation just a quick PoC with engineer designed UI.
 
 ### Online demo
-http://jmto.fi/lifx/
+https://jmto.fi/lifx/ or http://jmto.fi/lifx/
 
 ### Installation
 Run following commands in your web servers root
