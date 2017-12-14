@@ -16,6 +16,8 @@ app.controller('LifxController', ['$scope','$log','$http', function($scope, $log
 	$scope.groups = [];
 	$scope.locations = [];
 	$scope.current = 'all';
+	$scope.selector = 'all';
+	$scope.zones = '';
 	$scope.tab = 'color';
 	$scope.color = '#ffffff';
 	$scope.kelvin = 3500;
@@ -72,6 +74,7 @@ app.controller('LifxController', ['$scope','$log','$http', function($scope, $log
 						}
 					}
 				}
+				$scope.updateSelector();
 				$log.log('Found following lamps:', $scope.lights, $scope.groups, $scope.locations);
 				$scope.loading = false;
 			}, function errorCallback(response) {
@@ -85,6 +88,9 @@ app.controller('LifxController', ['$scope','$log','$http', function($scope, $log
 				$scope.loading = false;
 			});
 		}
+	};
+	$scope.updateSelector = function() {
+		$scope.selector = $scope.current + ($scope.zones ? '|'+$scope.zones : '');
 	};
 	$scope.init();
 	$scope.setToken = function() {
@@ -127,7 +133,7 @@ app.controller('LifxController', ['$scope','$log','$http', function($scope, $log
 			color = color+" kelvin:"+kelvin;
 		}
 		var data = {
-			power: 'on',
+			power_on: true,
 			color: color,
 			brightness: brightness/100,
 			duration: duration
@@ -137,7 +143,7 @@ app.controller('LifxController', ['$scope','$log','$http', function($scope, $log
 	};
 	$scope.setEffect1 = function(selector, effect, color1, from_color, period, cycles, peak) {
 		var data = {
-			power: 'on',
+			power_on: true,
 			color: color1,
 			from_color: from_color,
 			period: period,
@@ -155,10 +161,11 @@ app.controller('LifxController', ['$scope','$log','$http', function($scope, $log
 				{ brightness: 0.75 },
 				{ brightness: 0.5 },
 				{ brightness: 0.25 },
-				{ power: 'off' }
+				{ power_on: false }
+
 			],
 			defaults: {
-				power: 'on',
+				power_on: true,
 				saturation: 0,
 				duration: 0
 			}

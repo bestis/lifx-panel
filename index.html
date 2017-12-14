@@ -22,10 +22,10 @@
 	<link rel="stylesheet" href="main.css">
 </head>
 <body ng-controller="LifxController">
-	<div ng-if="loading" class="loading">
+	<div ng-show="loading" class="loading">
 		<img class="loading-image" src="ajax-loader.gif" alt="Loading..." />
 	</div>
-	<div ng-if="!token" class="container" ng-cloak>
+	<div ng-show="!token" class="container" ng-cloak>
 		<form class="form-signin" ng-submit="setToken()">
 			<div class="control-group">
 				<h2 class="form-signin-heading">Sign in</h2>
@@ -38,14 +38,14 @@
 			</div>
 		</form>
 	</div>
-	<div ng-if="token" ng-cloak>
+	<div ng-show="token" ng-cloak>
 		<div id="menu">
 			<button class="btn btn-lg btn-primary" ng-click="postRequest('all','toggle')">Power on/off</button>
 			<button class="btn btn-lg btn-primary" ng-click="clearToken()">Logout</button>
 		</div>
 		<div id="selectors">
 			<p><strong>Select lamp, location or group</strong></p>
-			<select id="lampselect" ng-model="current">
+			<select id="lampselect" ng-model="current" ng-change="updateSelector()">
 				<optgroup label="All">
 					<option value="all">All</option>
 				</optgroup>
@@ -60,6 +60,8 @@
 					<option ng-repeat="group in groups" value="group_id:[[ group.id ]]">[[ group.name ]]</option>
 				</optgroup>
 			</select>
+			<strong>Zones</strong>: <input type="text" size=5 id="zoneselect" ng-model="zones" ng-change="updateSelector()">
+			<strong>Selector</strong>: <span ng-bind="selector"></span>
 		</div>
 		<div ng-show="tab == 'color'" id="color">
 			<div id="colorwheel">
@@ -97,13 +99,13 @@
 			</div>
 		</div>
 		<div id="actions">
-			<button ng-show="tab == 'color'" class="btn btn-lg btn-primary" ng-click="setColor(current, color, brightness, kelvin, duration)">Set color</button>
+			<button ng-show="tab == 'color'" class="btn btn-lg btn-primary" ng-click="setColor(selector, color, brightness, kelvin, duration)">Set color</button>
 			<button ng-show="tab != 'color'" class="btn btn-lg btn-primary" ng-click="tab = 'color'">Color</button>
-			<button ng-show="tab == 'breathe'" class="btn btn-lg btn-primary" ng-click="setEffect1(current, 'breathe', color1, from_color, period, cycles, peak)">Set breathing</button>
-			<button ng-show="tab == 'breathe'" class="btn btn-lg btn-primary" ng-click="setEffect1(current, 'pulse', color1, from_color, period, cycles, peak)">Set pulse</button>
+			<button ng-show="tab == 'breathe'" class="btn btn-lg btn-primary" ng-click="setEffect1(selector, 'breathe', color1, from_color, period, cycles, peak)">Set breathing</button>
+			<button ng-show="tab == 'breathe'" class="btn btn-lg btn-primary" ng-click="setEffect1(selector, 'pulse', color1, from_color, period, cycles, peak)">Set pulse</button>
 			<button ng-show="tab != 'breathe'" class="btn btn-lg btn-primary" ng-click="tab = 'breathe'">Breathe or pulse</button>
-			<button class="btn btn-lg btn-primary" ng-click="powerCycle(current)">Brigthness</button>
-			<button class="btn btn-lg btn-primary" ng-click="postRequest(current,'toggle')">On/Off</button>
+			<button class="btn btn-lg btn-primary" ng-click="powerCycle(selectpr)">Brigthness</button>
+			<button class="btn btn-lg btn-primary" ng-click="postRequest(selector,'toggle')">On/Off</button>
 		</div>
 	</div >
 
