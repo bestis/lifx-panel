@@ -90,7 +90,7 @@ app.controller('LifxController', ['$scope','$log','$http', function($scope, $log
 		}
 	};
 	$scope.updateSelector = function() {
-		$scope.selector = $scope.current + ($scope.zones ? '|'+$scope.zones : '');
+		$scope.selector = $scope.current + ($scope.zones ? '|' + $scope.zones : '');
 	};
 	$scope.init();
 	$scope.setToken = function() {
@@ -133,7 +133,7 @@ app.controller('LifxController', ['$scope','$log','$http', function($scope, $log
 			color = color+" kelvin:"+kelvin;
 		}
 		var data = {
-			power_on: true,
+			power: 'on',
 			color: color,
 			brightness: brightness/100,
 			duration: duration
@@ -148,9 +148,11 @@ app.controller('LifxController', ['$scope','$log','$http', function($scope, $log
 			from_color: from_color,
 			period: period,
 			cycles: cycles,
-			peak: peak/100,
 			persist: false
 		};
+		if (effect == 'breathe') {
+			data['peak'] = peak/100;
+		}
 		$scope.postRequest(selector, 'effects/'+effect, data);
 		$log.log(selector,data);
 	};
@@ -161,12 +163,11 @@ app.controller('LifxController', ['$scope','$log','$http', function($scope, $log
 				{ brightness: 0.75 },
 				{ brightness: 0.5 },
 				{ brightness: 0.25 },
-				{ power_on: false }
+				{ power: 'off' }
 
 			],
 			defaults: {
-				power_on: true,
-				saturation: 0,
+				power: 'on',
 				duration: 0
 			}
 		};
