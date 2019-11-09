@@ -9,6 +9,6 @@
     "url": "https://github.com/bestis/lifx-panel.git"
   },
   "dependencies": {
-    "bower": "~1.7"
+    "bower": ">=1.8.8"
   }
 }
